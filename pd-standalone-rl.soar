@@ -1,0 +1,226 @@
+# Initialization 
+
+sp {propose*initialize-prisoners-dilemma
+   (state <s> ^superstate nil
+             -^name)
+-->
+   (<s> ^operator <op> +)
+   (<op> ^name initialize-prisoners-dilemma)
+}
+
+sp {apply*initialize-prisoners-dilemma
+   (state <s> ^operator <op>)
+   (<op> ^name initialize-prisoners-dilemma)
+-->
+   (<s> ^name prisoners-dilemma
+        ^player <p1> <p2>
+        ^rounds <rounds>)
+   (<p1> ^name agent
+         ^score 0)
+   (<p2> ^name opponent
+         ^score 0)
+   (<rounds> ^current 0
+             ^wanted 1)
+}
+
+# Propose Agent's coop and defect moves
+
+sp {prisoners-dilemma*propose*cooperate
+   (state <s> ^name prisoners-dilemma
+              ^player <p1> <p2>
+              )
+   (<p1> ^name agent
+         ^score <s1>)
+   (<p2> ^name opponent
+         ^score <s2>)
+-->
+   (<s> ^operator <op> +)
+   (<op> ^name coop)
+}
+
+sp {prisoners-dilemma*propose*defect
+   (state <s> ^name prisoners-dilemma
+              ^player <p1> <p2>)
+   (<p1> ^name agent
+         ^score <s1>)
+   (<p2> ^name opponent
+         ^score <s2>)
+-->
+   (<s> ^operator <op> +)
+   (<op> ^name defect)
+}
+
+# Opponent's random move - when Agent proposes COOP (so,  
+# every time) an elaboration choses opponent's random move
+
+sp {prisoners-dilemma*elaborate*opponent-move
+   (state <s> ^name prisoners-dilemma
+              ^operator <o> +
+              # ^operator { <> <o1> } +
+              ^player <p2>)
+   (<o> ^name coop)
+   (<p2> ^name opponent)
+-->
+   (<p2> ^move (rand-int 1)) # 0 for defect, 1 for coop
+}
+
+# Apply Agent's coop and defect moves
+
+sp {prisoners-dilemma*apply*coop-coop
+   (state <s> ^operator <op>
+              ^player <p1> <p2>
+              ^rounds <rou>)
+   (<rou> ^current <cu>)
+   (<op> ^name coop)
+   (<p1> ^name agent
+         ^score <s1>)
+   (<p2> ^name opponent
+         ^score <s2>
+         ^move 1)
+-->
+   (<p1> ^score <s1> - (+ <s1> 3))
+   (<p2> ^score <s2> - (+ <s2> 3))
+   (<rou> ^current <cu> - (+ <cu> 1))
+   (write (crlf) |Round |(- (dc) 1) |: coop-coop|)
+
+}
+
+sp {prisoners-dilemma*apply*coop-defect
+   (state <s> ^operator <op>
+              ^player <p1> <p2>
+              ^rounds <rou>)
+   (<rou> ^current <cu>)
+   (<op> ^name coop)
+   (<p1> ^name agent
+         ^score <s1>)
+   (<p2> ^name opponent
+         ^score <s2>
+         ^move 0)
+-->
+   (<p2> ^score <s2> - (+ <s2> 5))
+   (<rou> ^current <cu> - (+ <cu> 1))
+   (write (crlf) |Round |(- (dc) 1) |: coop-defect|)
+}
+
+sp {prisoners-dilemma*apply*defect-coop
+   (state <s> ^operator <op>
+              ^player <p1> <p2>
+              ^rounds <rou>)
+   (<rou> ^current <cu>)
+   (<op> ^name defect)
+   (<p1> ^name agent
+         ^score <s1>)
+   (<p2> ^name opponent
+         ^score <s2>
+         ^move 1)
+-->
+   (<p1> ^score <s1> - (+ <s1> 5))
+   (<rou> ^current <cu> - (+ <cu> 1))
+   (write (crlf) |Round |(- (dc) 1) |: defect-coop|)
+}
+
+sp {prisoners-dilemma*apply*defect-defect
+   (state <s> ^operator <op>
+              ^player <p1> <p2>
+              ^rounds <rou>)
+   (<rou> ^current <cu>)
+   (<op> ^name defect)
+   (<p1> ^name agent
+         ^score <s1>)
+   (<p2> ^name opponent
+         ^score <s2>
+         ^move 0)
+-->
+   (<p1> ^score <s1> - (+ <s1> 1))
+   (<p2> ^score <s2> - (+ <s2> 1))
+   (<rou> ^current <cu> - (+ <cu> 1))
+   (write (crlf) |Round |(- (dc) 1) |: defect-defect|)
+}
+
+# Elaborate score after each operator application
+
+sp {prisoners-dilemma*monitor*operator-application
+   (state <s> ^name prisoners-dilemma
+              ^player <p1> <p2>)
+   (<p1> ^name agent
+         ^score <s1>)
+   (<p2> ^name opponent
+         ^score <s2>)
+-->
+   (write (crlf) |Agent: | <s1> | / Opponent: | <s2> )
+}
+
+# Elaborate who the winner is
+
+sp {prisoners-dilemma*elaborate*winner-agent
+   (state <s> ^name prisoners-dilemma
+              ^player <p1> <p2>
+              ^rounds.current <cu>
+              ^rounds.wanted <cu>)
+   (<p1> ^name agent
+         ^score <s1>)
+   (<p2> ^name opponent
+         ^score { < <s1> <s2>})
+-->
+   (write (crlf) |--- WINNER IS: AGENT ---| )
+   (halt)
+}
+
+sp {prisoners-dilemma*elaborate*winner-opponent
+   (state <s> ^name prisoners-dilemma
+              ^player <p1> <p2>
+              ^rounds.current <cu>
+              ^rounds.wanted <cu>)
+   (<p1> ^name agent
+         ^score <s1>)
+   (<p2> ^name opponent
+         ^score { > <s1> <s2>})
+-->
+   (write (crlf) |--- WINNER IS: OPPONENT ---| )
+   (halt)
+}
+
+sp {prisoners-dilemma*elaborate*winner-draw
+   (state <s> ^name prisoners-dilemma
+              ^player <p1> <p2>
+              ^rounds.current <cu>
+              ^rounds.wanted <cu>)
+   (<p1> ^name agent
+         ^score <s1>)
+   (<p2> ^name opponent
+         ^score <s1>)
+-->
+   (write (crlf) |--- THE GAME IS DRAW ---| )
+   (halt)
+}
+
+# Learning Rules
+
+sp {prisoners-dilemma*rl*coop
+   (state <s> ^name prisoners-dilemma
+              ^operator <op> +)
+   (<op> ^name coop)
+-->
+   (<s> ^operator <op> = 0)
+}
+
+sp {prisoners-dilemma*rl*defect
+   (state <s> ^name prisoners-dilemma
+              ^operator <op> +)
+   (<op> ^name defect)
+-->
+   (<s> ^operator <op> = 0)
+}
+
+# Reward (once at the end of all iterations)
+
+sp {elaborate*reward*end-game
+   (state <s> ^name prisoners-dilemma
+              ^reward-link <r>
+              ^player (^name agent
+                       ^score <score>)
+              ^rounds.current <cu>
+              ^rounds.wanted <cu>)
+-->
+   (<r> ^reward.value <score>)
+}
