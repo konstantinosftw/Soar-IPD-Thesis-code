@@ -46,7 +46,7 @@ indifferent-selection --epsilon 0.3
 ## Run the any Agent
 
 1. Open the agent you want to run, e.g. `ipd-rl-look-back.soar` in an editor
-2. Uncomment the strategy you want to play against; RANDOM is the default uncommented one. *Warning*: You can have only ONE opponent strategy uncommented at any given time, otherwise the opponent will run in an infinite ellaboration error.
-3. After having also completed the `Prepare to Run` part, click on the `Source` button of the `SoarJavaDebugger.bat` and load the selected agend.
+2. Uncomment the single strategy you want to play against; RANDOM is the default uncommented one. *Warning*: You can have only ONE opponent strategy uncommented at any given time, otherwise the opponent will run in an infinite ellaboration error. If you want to play against a chain opponents, select the `ipd-multi-opponent-runs.soar` and move to the next step.
+3. After having also completed the `Prepare to Run` part, click on the `Source` button in the SoarJavaDebugger and load the selected agend.
 4. Click `Initialize` follower by `Run`
 5. Watch the magic happen
