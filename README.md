@@ -43,7 +43,7 @@ indifferent-selection --epsilon 0.3
 ```
 5. Reduce the epsilon as training progresses to refine results. Do so by using the last command.
 
-## Run the any Agent
+## Run the Agent
 
 1. Open the agent you want to run, e.g. `ipd-rl-look-back.soar` in an editor
 2. Uncomment the single strategy you want to play against; RANDOM is the default uncommented one. *Warning*: You can have only ONE opponent strategy uncommented at any given time, otherwise the opponent will run in an infinite ellaboration error. If you want to play against a chain opponents, select the `ipd-multi-opponent-runs.soar` and move to the next step.
